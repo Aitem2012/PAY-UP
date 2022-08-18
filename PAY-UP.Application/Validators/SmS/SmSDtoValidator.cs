@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using PAY_UP.Application.Dtos;
+using PAY_UP.Application.Dtos.SmS;
 
 namespace PAY_UP.Application.Validators.SmS
 {

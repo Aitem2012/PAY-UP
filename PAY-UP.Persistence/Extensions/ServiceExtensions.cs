@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PAY_UP.Application.Abstracts.Infrastructure;
 using PAY_UP.Application.Abstracts.Persistence;
+using PAY_UP.Application.Validators.SmS;
 using PAY_UP.Domain.AppUsers;
 using PAY_UP.Infrastructure.Email;
 using PAY_UP.Infrastructure.Sms;
 using PAY_UP.Persistence.Context;
+using System.Reflection;
 
 namespace PAY_UP.Persistence.Extensions
 {
@@ -28,6 +31,10 @@ namespace PAY_UP.Persistence.Extensions
         {
             services.AddScoped<ISmsService, SmsService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddFluentValidation(opt =>
+            {
+                opt.RegisterValidatorsFromAssembly(typeof(SmSDtoValidator).GetTypeInfo().Assembly);
+            });
         }
 
     }

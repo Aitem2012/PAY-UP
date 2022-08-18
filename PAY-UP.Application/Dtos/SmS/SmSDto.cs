@@ -1,6 +1,6 @@
 ﻿using PAY_UP.Domain.Common;
 
-namespace PAY_UP.Application.Dtos
+namespace PAY_UP.Application.Dtos.SmS
 {
     public class SmSDto
     {
