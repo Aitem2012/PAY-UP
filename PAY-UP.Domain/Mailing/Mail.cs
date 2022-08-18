@@ -3,7 +3,7 @@ using PAY_UP.Domain.Common;
 
 namespace PAY_UP.Domain.Mailing
 {
-    public class Mail : BaseClass
+    public class Mail : BaseEntity
     {
         public string RecipientEmail { get; set; }
         public string Message { get; set; }
