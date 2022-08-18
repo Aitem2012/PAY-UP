@@ -1,6 +1,6 @@
 ﻿namespace PAY_UP.Domain.Common
 {
-    public abstract class BaseClass
+    public abstract class BaseEntity
     {
         public Guid Id { get; set; }
         public DateTime DateCreated { get; set; }

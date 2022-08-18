@@ -3,7 +3,7 @@ using PAY_UP.Domain.Common;
 
 namespace PAY_UP.Domain.Messaging
 {
-    public class Sms : BaseClass
+    public class Sms : BaseEntity
     {
         public string PhoneNumber { get; set; }
         public string Message { get; set; }

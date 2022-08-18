@@ -1,7 +1,11 @@
-var builder = WebApplication.CreateBuilder(args);
+using PAY_UP.Persistence.Extensions;
 
+var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 // Add services to the container.
 
+builder.Services.AddDatabaseServices(config);
+builder.Services.AddApplicationServices();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
