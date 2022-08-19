@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PAY_UP.Application.Abstracts.Infrastructure;
 using PAY_UP.Application.Abstracts.Persistence;
 using PAY_UP.Application.Abstracts.Repositories;
 using PAY_UP.Application.Dtos.Users;
+using PAY_UP.Common.Extensions;
 using PAY_UP.Domain.AppUsers;
 using System.Security.Claims;
 
@@ -17,13 +19,15 @@ namespace PAY_UP.Persistence.Repositories
         private readonly IAppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ILogger<UserRepository> _logger;
-        public UserRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IAppDbContext context, IMapper mapper, ILogger<UserRepository> logger)
+        private readonly IEmailService _emailService;
+        public UserRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IAppDbContext context, IMapper mapper, ILogger<UserRepository> logger, IEmailService emailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
             _mapper = mapper;
             _logger = logger;
+            _emailService = emailService;
         }
 
         public async Task<AppUser> CreateAsync(CreateUserDto entity, CancellationToken cancellationToken, string role = "user")
@@ -60,40 +64,66 @@ namespace PAY_UP.Persistence.Repositories
                     new Claim(ClaimTypes.Email, user.Email),
                 });
 
+                var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                //TODO: Send confirmation email
+                //await _emailService.SendEmailAsync(new EmailRequestDto
+                //{
+                //    RecipientEmail = user.Email,
+                //    Subject = "Email Confirmation",
+                //    Message = $""""""<p>Click <a href="{confirmationToken}">here</a> to confirm your email </p>"""""",
+
+                //}, "no-reply@pay-up.com");
+
                 return user;
             }
 
             return null;
         }
 
-        public Task<bool> DeleteUserAsync(string id, CancellationToken cancellationToken)
+        public async Task<bool> DeleteUserAsync(string id, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var userToDisable = await _context.Users.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            if (userToDisable.IsNull())
+            {
+                return false;
+            }
+            userToDisable.IsActive = false;
+            _context.Users.Attach(userToDisable);
+            return await _context.SaveChangesAsync(cancellationToken) > 0;
         }
 
-        public Task<IEnumerable<AppUser>> GetActiveUsersAsync()
+        public async Task<IEnumerable<AppUser>> GetActiveUsersAsync()
         {
-            throw new NotImplementedException();
+            var users = await _context.Users.Where(x => x.IsActive).ToListAsync();
+            return users;
         }
 
-        public Task<IEnumerable<AppUser>> GetAllAsync()
+        public async Task<IEnumerable<AppUser>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Users.ToListAsync();
         }
 
-        public Task<AppUser> GetByEmailAsync(string email)
+        public async Task<AppUser> GetByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            return await _context.Users.FirstOrDefaultAsync(x => x.UserName == email);
         }
 
-        public Task<AppUser> GetByIdAsync(string id)
+        public async Task<AppUser> GetByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            return await _context.Users.FirstOrDefaultAsync(x => x.Id.Equals(id));
         }
 
-        public Task<AppUser> UpdateAsync(UpdateUserDto entity, CancellationToken cancellationToken)
+        public async Task<AppUser> UpdateAsync(UpdateUserDto entity, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var userInDb = await _context.Users.FirstOrDefaultAsync(x => x.Id.Equals(entity.AppUserId));
+            if (userInDb.IsNull())
+            {
+                return null;
+            }
+            var user = _mapper.Map(entity, userInDb);
+            _context.Users.Attach(user);
+            await _context.SaveChangesAsync(cancellationToken);
+            return user;
         }
     }
 }
