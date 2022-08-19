@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PAY-UP.Common\PAY-UP.Common.csproj" />
     <ProjectReference Include="..\PAY-UP.Domain\PAY-UP.Domain.csproj" />
   </ItemGroup>
 

@@ -19,8 +19,4 @@
     <ProjectReference Include="..\PAY-UP.Persistence\PAY-UP.Persistence.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
