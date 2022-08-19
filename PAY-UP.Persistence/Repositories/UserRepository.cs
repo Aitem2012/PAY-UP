@@ -92,14 +92,14 @@ namespace PAY_UP.Persistence.Repositories
             return await _context.SaveChangesAsync(cancellationToken) > 0;
         }
 
-        public async Task<IEnumerable<AppUser>> GetActiveUsersAsync()
+        public async Task<IEnumerable<AppUser>> GetAllAsync(bool isActive = false)
         {
-            var users = await _context.Users.Where(x => x.IsActive).ToListAsync();
-            return users;
-        }
-
-        public async Task<IEnumerable<AppUser>> GetAllAsync()
-        {
+            var users = new List<AppUser>();
+            if (isActive)
+            {
+                users = await _context.Users.Where(x => x.IsActive).ToListAsync();
+                return users;
+            }
             return await _context.Users.ToListAsync();
         }
 

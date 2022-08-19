@@ -6,11 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 using PAY_UP.Application;
 using PAY_UP.Application.Abstracts.Infrastructure;
 using PAY_UP.Application.Abstracts.Persistence;
+using PAY_UP.Application.Abstracts.Repositories;
+using PAY_UP.Application.Abstracts.Services;
+using PAY_UP.Application.Services;
 using PAY_UP.Application.Validators.SmS;
 using PAY_UP.Domain.AppUsers;
 using PAY_UP.Infrastructure.Email;
 using PAY_UP.Infrastructure.Sms;
 using PAY_UP.Persistence.Context;
+using PAY_UP.Persistence.Repositories;
 using System.Reflection;
 
 namespace PAY_UP.Persistence.Extensions
@@ -33,6 +37,8 @@ namespace PAY_UP.Persistence.Extensions
             services.AddAutoMapper(typeof(PayUpMappingProfile));
             services.AddScoped<ISmsService, SmsService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
             services.AddFluentValidation(opt =>
             {
                 opt.RegisterValidatorsFromAssembly(typeof(SmSDtoValidator).GetTypeInfo().Assembly);
