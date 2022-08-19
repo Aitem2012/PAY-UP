@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PAY_UP.Application;
 using PAY_UP.Application.Abstracts.Infrastructure;
 using PAY_UP.Application.Abstracts.Persistence;
 using PAY_UP.Application.Validators.SmS;
@@ -29,6 +30,7 @@ namespace PAY_UP.Persistence.Extensions
 
         public static void AddApplicationServices(this IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(PayUpMappingProfile));
             services.AddScoped<ISmsService, SmsService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddFluentValidation(opt =>

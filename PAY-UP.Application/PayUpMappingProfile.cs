@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using PAY_UP.Application.Dtos.Users;
+using PAY_UP.Domain.AppUsers;
 
 namespace PAY_UP.Application
 {
@@ -8,6 +10,11 @@ namespace PAY_UP.Application
         {
             AllowNullCollections = true;
             AllowNullDestinationValues = true;
+
+            CreateMap<CreateUserDto, AppUser>();
+            CreateMap<UpdateUserDto, AppUser>();
+            CreateMap<AppUser, GetUserDto>()
+                .ForMember(src => src.Fullname, dest => dest.MapFrom(x => $"{x.FirstName} {x.LastName}"));
         }
     }
 }
