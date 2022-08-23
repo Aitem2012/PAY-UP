@@ -24,7 +24,8 @@ namespace PAY_UP.Application.Services
             {
                 return new ResponseObject<GetUserDto>().CreateResponse("User email already exist", false, null);
             }
-            return new ResponseObject<GetUserDto>().CreateResponse("User successfully created", true, _mapper.Map<GetUserDto>(user));
+            return new ResponseObject<GetUserDto>().CreateResponse("User successfully created, Please check your " +
+                "email for email confirmation", true, _mapper.Map<GetUserDto>(user));
         }
 
         public async Task<ResponseObject<bool>> DeleteUserAsync(string id)

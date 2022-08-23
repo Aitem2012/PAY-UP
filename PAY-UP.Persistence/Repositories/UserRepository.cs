@@ -76,7 +76,7 @@ namespace PAY_UP.Persistence.Repositories
                 };
 
                 //TODO: Send confirmation email
-                var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "auth/confirm-email ", queryParams, "ConfirmationEmail.html", _httpContext.HttpContext);
+                var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "api/auth/confirm-email ", queryParams, "ConfirmationEmail.html", _httpContext.HttpContext);
                 var res = await _emailService.SendEmailAsync(user.Email, "Email Confirmation", template);
 
                 return user;

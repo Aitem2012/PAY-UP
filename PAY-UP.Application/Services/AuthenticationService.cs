@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PAY_UP.Application.Abstracts.Infrastructure;
 using PAY_UP.Application.Abstracts.Services;
 using PAY_UP.Application.Dtos.Authentication;
+using PAY_UP.Application.Dtos.Token;
 using PAY_UP.Application.Dtos.Users;
 using PAY_UP.Common.Extensions;
 using PAY_UP.Common.Helpers;
@@ -18,21 +21,29 @@ namespace PAY_UP.Application.Services
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
         private readonly IHttpContextAccessor _httpContext;
-        public AuthenticationService(IUserService userService, UserManager<AppUser> userManager, IMapper mapper, IEmailService emailService, IHttpContextAccessor httpContext)
+        private readonly ILogger<AuthenticationService> _logger;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly ITokenService _tokenService;
+        private readonly IOptions<JWTData> _options;
+        public AuthenticationService(IUserService userService, UserManager<AppUser> userManager, IMapper mapper, IEmailService emailService, IHttpContextAccessor httpContext, ILogger<AuthenticationService> logger, SignInManager<AppUser> signInManager, ITokenService tokenService, IOptions<JWTData> options)
         {
             _userService = userService;
             _userManager = userManager;
             _mapper = mapper;
             _emailService = emailService;
             _httpContext = httpContext;
+            _logger = logger;
+            _signInManager = signInManager;
+            _tokenService = tokenService;
+            _options = options;
         }
 
-        public async Task<ResponseObject<bool>> ChangePasswordAsync(ChangePasswordDto changePasswordRequest, string userId)
+        public async Task<ResponseObject<bool>> ChangePasswordAsync(ChangePasswordDto changePasswordRequest)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(changePasswordRequest.UserId);
             if (user.IsNull())
             {
-                return new ResponseObject<bool>().CreateResponse($"User with Id: {userId} does not exits", false, false);
+                return new ResponseObject<bool>().CreateResponse($"User with Id: {changePasswordRequest.UserId} does not exits", false, false);
             }
             var passwordExist = await _userManager.CheckPasswordAsync(user, changePasswordRequest.OldPassword);
             if (!passwordExist)
@@ -49,7 +60,7 @@ namespace PAY_UP.Application.Services
 
         public async Task<ResponseObject<bool>> ConfirmEmailAsync(ConfirmEmailDto confirmEmailReques)
         {
-            var user = await _userManager.FindByEmailAsync(confirmEmailReques.Email);
+            var user = await FindByEmailAsync(confirmEmailReques.Email); ;
             if (user.IsNull())
             {
                 return new ResponseObject<bool>().CreateResponse($"User with email: {confirmEmailReques.Email} does not exist", false, false);
@@ -57,6 +68,10 @@ namespace PAY_UP.Application.Services
             var emailConfirmed = await _userManager.ConfirmEmailAsync(user, confirmEmailReques.Token);
             if (!emailConfirmed.Succeeded)
             {
+                foreach (var err in emailConfirmed.Errors)
+                {
+                    _logger.LogError($"{err.Code} :{err.Description}");
+                }
                 return new ResponseObject<bool>().CreateResponse("Email could not be confirmed", false, false);
             }
             user.IsActive = true;
@@ -76,7 +91,7 @@ namespace PAY_UP.Application.Services
 
         public async Task<ResponseObject<bool>> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordRequest)
         {
-            var user = await _userManager.FindByEmailAsync(forgotPasswordRequest.Email);
+            var user = await FindByEmailAsync(forgotPasswordRequest.Email);
             if (user.IsNull())
             {
                 return new ResponseObject<bool>().CreateResponse($"No user with email: {forgotPasswordRequest.Email}", false, false);
@@ -88,20 +103,60 @@ namespace PAY_UP.Application.Services
                 ["token"] = token
             };
 
-            var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "auth/reset-password", queryParams, "ResetPasswordTemplated.html", _httpContext.HttpContext);
-            //TODO: Send forgot password email
-
+            var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "api/auth/reset-password", queryParams, "ResetPasswordTemplate.html", _httpContext.HttpContext);
+            await _emailService.SendEmailAsync(user.Email, "Password Reset", template);
             return new ResponseObject<bool>().CreateResponse("Password reset link has been sent to your email", true, true);
         }
 
-        public Task<ResponseObject<LoginResponseDto>> LoginAsync(LoginDto loginRequest)
+        public async Task<ResponseObject<LoginResponseDto>> LoginAsync(LoginDto loginRequest)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+            if (user.IsNull())
+            {
+                return new ResponseObject<LoginResponseDto>().CreateResponse($"No user with email: {loginRequest.Email}", false, null);
+            }
+            if (!user.IsActive)
+            {
+                return new ResponseObject<LoginResponseDto>().CreateResponse($"Please verify your email: {loginRequest.Email}", false, null);
+            }
+            var signIn = await _signInManager.PasswordSignInAsync(user, loginRequest.Password, false, false);
+            if (!signIn.Succeeded)
+            {
+                return new ResponseObject<LoginResponseDto>().CreateResponse("Incorrect password. Try Again!", false, null);
+            }
+            var userRoles = await _userManager.GetRolesAsync(user) as List<string>;
+            var token = _tokenService.GenerateToken(user, userRoles, _options);
+            var userToReturn = _mapper.Map<LoginResponseDto>(user);
+            userToReturn.Token = token;
+            return new ResponseObject<LoginResponseDto>().CreateResponse("Login successfully", true, userToReturn);
         }
 
-        public Task<ResponseObject<bool>> ResetPasswordAsync(ResetPasswordDto resetPasswordRequest)
+        public async Task<ResponseObject<bool>> ResetPasswordAsync(ResetPasswordDto resetPasswordRequest)
         {
-            throw new NotImplementedException();
+            var user = await FindByEmailAsync(resetPasswordRequest.Email);
+            if (user.IsNull())
+            {
+                return new ResponseObject<bool>().CreateResponse($"No user with email: {resetPasswordRequest.Email}", false, false);
+            }
+            var res = await _userManager.ResetPasswordAsync(user, resetPasswordRequest.Token, resetPasswordRequest.Password);
+            if (!res.Succeeded)
+            {
+                foreach (var err in res.Errors)
+                {
+                    _logger.LogError($"{err.Code} :{err.Description}");
+                }
+                return new ResponseObject<bool>().CreateResponse("Password could not be reset. Try again!", false, false);
+            }
+            return new ResponseObject<bool>().CreateResponse("Password reset successfully", true, true);
         }
+
+        public async Task<ResponseObject<Task>> SignOutAsync()
+        {
+            await _signInManager.SignOutAsync();
+            _httpContext.HttpContext.Session.Clear();
+            return new ResponseObject<Task>().CreateResponse("Signout successfully", true, Task.CompletedTask);
+        }
+
+        private async Task<AppUser> FindByEmailAsync(string email) => await _userManager.FindByEmailAsync(email);
     }
 }
