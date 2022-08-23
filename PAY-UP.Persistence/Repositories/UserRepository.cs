@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,7 @@ using PAY_UP.Application.Abstracts.Persistence;
 using PAY_UP.Application.Abstracts.Repositories;
 using PAY_UP.Application.Dtos.Users;
 using PAY_UP.Common.Extensions;
+using PAY_UP.Common.Helpers;
 using PAY_UP.Domain.AppUsers;
 using System.Security.Claims;
 
@@ -20,7 +22,8 @@ namespace PAY_UP.Persistence.Repositories
         private readonly IMapper _mapper;
         private readonly ILogger<UserRepository> _logger;
         private readonly IEmailService _emailService;
-        public UserRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IAppDbContext context, IMapper mapper, ILogger<UserRepository> logger, IEmailService emailService)
+        private readonly IHttpContextAccessor _httpContext;
+        public UserRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IAppDbContext context, IMapper mapper, ILogger<UserRepository> logger, IEmailService emailService, IHttpContextAccessor httpContext)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -28,6 +31,7 @@ namespace PAY_UP.Persistence.Repositories
             _mapper = mapper;
             _logger = logger;
             _emailService = emailService;
+            _httpContext = httpContext;
         }
 
         public async Task<AppUser> CreateAsync(CreateUserDto entity, CancellationToken cancellationToken, string role = "user")
@@ -65,14 +69,15 @@ namespace PAY_UP.Persistence.Repositories
                 });
 
                 var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                //TODO: Send confirmation email
-                //await _emailService.SendEmailAsync(new EmailRequestDto
-                //{
-                //    RecipientEmail = user.Email,
-                //    Subject = "Email Confirmation",
-                //    Message = $""""""<p>Click <a href="{confirmationToken}">here</a> to confirm your email </p>"""""",
+                var queryParams = new Dictionary<string, string>()
+                {
+                    ["email"] = user.Email,
+                    ["token"] = confirmationToken
+                };
 
-                //}, "no-reply@pay-up.com");
+                //TODO: Send confirmation email
+                var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "api/auth/confirm-email ", queryParams, "ConfirmationEmail.html", _httpContext.HttpContext);
+                var res = await _emailService.SendEmailAsync(user.Email, "Email Confirmation", template);
 
                 return user;
             }

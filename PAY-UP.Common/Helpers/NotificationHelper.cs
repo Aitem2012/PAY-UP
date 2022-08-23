@@ -11,9 +11,11 @@ namespace PAY_UP.Common.Helpers
 
             //get the email link address
             var link = UrlHelper.GetEmailLink(queryParams, routePath, context);
+            var directory = Directory.GetCurrentDirectory();
 
             //Read from the template file and construct the email template
-            var templatePath = string.Join("\\", "..\\PAY-UP.Common" + "\\Template", templateFilename);
+            var path = $"{directory.Substring(0, directory.Length - 10)}PAY-UP.Common/Templates/";
+            var templatePath = string.Join("", path, templateFilename);
             var htmlContent = File.ReadAllText(templatePath);
             htmlContent = htmlContent.Replace("[name]", fullName);
             htmlContent = htmlContent.Replace("[baseAddress]", baseUrl);

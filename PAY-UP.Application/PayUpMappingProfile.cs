@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PAY_UP.Application.Dtos.Authentication;
 using PAY_UP.Application.Dtos.Users;
 using PAY_UP.Domain.AppUsers;
 
@@ -15,6 +16,8 @@ namespace PAY_UP.Application
             CreateMap<UpdateUserDto, AppUser>();
             CreateMap<AppUser, GetUserDto>()
                 .ForMember(src => src.Fullname, dest => dest.MapFrom(x => $"{x.FirstName} {x.LastName}"));
+            CreateMap<AppUser, LoginResponseDto>()
+            .ForMember(src => src.Fullname, dest => dest.MapFrom(x => $"{x.FirstName} {x.LastName}"));
         }
     }
 }
