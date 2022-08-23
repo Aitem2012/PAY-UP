@@ -17,8 +17,8 @@ namespace PAY_UP.Application.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
-        private readonly HttpContext _httpContext;
-        public AuthenticationService(IUserService userService, UserManager<AppUser> userManager, IMapper mapper, IEmailService emailService, HttpContext httpContext)
+        private readonly IHttpContextAccessor _httpContext;
+        public AuthenticationService(IUserService userService, UserManager<AppUser> userManager, IMapper mapper, IEmailService emailService, IHttpContextAccessor httpContext)
         {
             _userService = userService;
             _userManager = userManager;
@@ -88,7 +88,7 @@ namespace PAY_UP.Application.Services
                 ["token"] = token
             };
 
-            var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "auth/reset-password", queryParams, "ResetPasswordTemplated.html", _httpContext);
+            var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "auth/reset-password", queryParams, "ResetPasswordTemplated.html", _httpContext.HttpContext);
             //TODO: Send forgot password email
 
             return new ResponseObject<bool>().CreateResponse("Password reset link has been sent to your email", true, true);

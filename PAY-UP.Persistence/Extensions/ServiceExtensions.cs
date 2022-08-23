@@ -35,10 +35,12 @@ namespace PAY_UP.Persistence.Extensions
         public static void AddApplicationServices(this IServiceCollection services)
         {
             services.AddAutoMapper(typeof(PayUpMappingProfile));
+            services.AddHttpContextAccessor();
             services.AddScoped<ISmsService, SmsService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddFluentValidation(opt =>
             {
                 opt.RegisterValidatorsFromAssembly(typeof(SmSDtoValidator).GetTypeInfo().Assembly);

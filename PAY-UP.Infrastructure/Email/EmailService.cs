@@ -33,6 +33,40 @@ namespace PAY_UP.Infrastructure.Email
         }
         //Todo: send another email
 
+        public async Task<bool> SendEmailAsync(string recipientEmail, string subject, string htmlContent, string plainContent = "")
+        {
+            try
+            {
+                var services = ConfigureServices(new ServiceCollection()).BuildServiceProvider();
+                var client = services.GetRequiredService<ISendGridClient>();
+                var msg = new SendGridMessage()
+                {
+                    //TODO: change the sender name and email to use config file
+                    From = new EmailAddress("aibrahim@cinnsol.com", "PAY-UP"),
+                    Subject = subject,
+                    PlainTextContent = plainContent,
+                    HtmlContent = htmlContent
+                };
+                msg.AddTo(new EmailAddress(recipientEmail));
+
+                //disable tracking by sendgrid
+                msg.SetOpenTracking(false);
+                msg.SetClickTracking(false, false);
+                msg.SetSubscriptionTracking(false);
+
+                //disable google analytics
+                msg.SetGoogleAnalytics(false);
+                var response = await client.SendEmailAsync(msg).ConfigureAwait(false);
+                if (response.StatusCode == System.Net.HttpStatusCode.Accepted) return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, new string[] { recipientEmail });
+                return false;
+            }
+            return false;
+        }
+
         private static IServiceCollection ConfigureServices(IServiceCollection services)
         {
             services.AddSendGrid(options => { options.ApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY", EnvironmentVariableTarget.User) ?? Configuration["SendGrid:ApiKey"]; });
