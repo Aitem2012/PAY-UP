@@ -18,6 +18,14 @@ namespace PAY_UP.Persistence.AppUsers.Configurations
             builder.HasMany(x => x.Mails)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.AppUserId);
+            
+            builder.HasMany(x => x.Debtors)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.AppUserId);
+            
+            builder.HasMany(x => x.Creditors)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.AppUserId);
         }
     }
 }

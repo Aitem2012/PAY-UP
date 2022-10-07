@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using PAY_UP.Domain.Creditors;
+using PAY_UP.Domain.Debtors;
 using PAY_UP.Domain.Mailing;
 using PAY_UP.Domain.Messaging;
 
@@ -15,5 +17,7 @@ namespace PAY_UP.Domain.AppUsers
         //one to many relationship
         public virtual ICollection<Mail> Mails { get; set; }
         public virtual ICollection<Sms> Smses { get; set; }
+        public virtual ICollection<Creditor> Creditors { get; set; }
+        public virtual ICollection<Debtor> Debtors { get; set; }
     }
 }

@@ -1,9 +1,8 @@
-﻿using PAY_UP.Domain.Common;
+using PAY_UP.Domain.Common;
 
-namespace PAY_UP.Domain.Creditor
-{
-    public class Creditor : BaseEntity
-    {
+namespace PAY_UP.Application.Dtos.Creditors{
+    public class GetCreditorDto{
+        public Guid Id { get; set; }       
         public string Firstname { get; set; }
         public string Lastname { get; set; }
         public string Email { get; set; }
