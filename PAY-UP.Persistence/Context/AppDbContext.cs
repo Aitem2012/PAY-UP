@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using PAY_UP.Application.Abstracts.Persistence;
 using PAY_UP.Domain.AppUsers;
 using PAY_UP.Domain.Common;
+using PAY_UP.Domain.Creditors;
+using PAY_UP.Domain.Debtors;
 using PAY_UP.Domain.Mailing;
 using System.Reflection;
 
@@ -74,6 +76,7 @@ namespace PAY_UP.Persistence.Context
         DbSet<AppUser> IAppDbContext.Users { get; set; }
         public DbSet<Mail> Mails { get; set; }
         public DbSet<Domain.Messaging.Sms> Sms { get; set; }
-
+        public DbSet<Creditor> Creditors { get; set; }
+        public DbSet<Debtor> Debtors { get; set; }
     }
 }
