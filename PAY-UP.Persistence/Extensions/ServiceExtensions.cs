@@ -46,6 +46,8 @@ namespace PAY_UP.Persistence.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ICreditorRepository, CreditorRepository>();
+            services.AddScoped<ICreditorService, CreditorService>();
             services.AddFluentValidation(opt =>
             {
                 opt.RegisterValidatorsFromAssembly(typeof(SmSDtoValidator).GetTypeInfo().Assembly);
