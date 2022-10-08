@@ -65,6 +65,13 @@ namespace PAY_UP.Application.Services{
         public async Task<ResponseObject<GetDebtorDto>> MakePayment(PaymentDto payment)
         {
             var debtor = await _debitorRepo.GetDebtorAsync(payment.Id);
+            if(debtor.Balance == 0){
+                return new ResponseObject<GetDebtorDto>().CreateResponse($"You don't have outstanding payment from this debtor", false, null);
+            }
+            if (payment.Amount > debtor.Balance)
+            {
+                return new ResponseObject<GetDebtorDto>().CreateResponse($"Overpayment is not allowed. Please try again.", false, null);
+            }
             debtor.AmountPaid += payment.Amount;
             debtor.Balance -= payment.Amount;
             debtor.Installment += 1;
