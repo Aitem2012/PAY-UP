@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using PAY_UP.Persistence.Extensions;
@@ -66,7 +67,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
+app.UseHangfireDashboard();
 
 app.MapControllers();
 
