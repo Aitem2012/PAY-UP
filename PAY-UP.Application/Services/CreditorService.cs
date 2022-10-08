@@ -2,6 +2,7 @@ using AutoMapper;
 using PAY_UP.Application.Abstracts.Repositories;
 using PAY_UP.Application.Abstracts.Services;
 using PAY_UP.Application.Dtos;
+using PAY_UP.Application.Dtos.Common;
 using PAY_UP.Application.Dtos.Creditors;
 using PAY_UP.Common.Helpers;
 using PAY_UP.Domain.Creditors;
@@ -21,6 +22,7 @@ namespace PAY_UP.Application.Services{
         public async Task<ResponseObject<GetCreditorDto>> CreateCreditorAsync(CreateCreditorDto creditor)
         {
             var creditorToCreate = _mapper.Map<Creditor>(creditor);
+            creditorToCreate.Balance = creditor.AmountOwed;
             var result = await _creditorRepo.CreateCreditorAsync(creditorToCreate);
             if(result == null){
                 return new ResponseObject<GetCreditorDto>().CreateResponse($"Creditor could not be created", false, null);
@@ -61,6 +63,20 @@ namespace PAY_UP.Application.Services{
                     _mapper.Map<IEnumerable<GetCreditorDto>>(creditors));
         }
 
+        public async Task<ResponseObject<GetCreditorDto>> MakePayment(PaymentDto payment)
+        {
+            var creditor = await _creditorRepo.GetCreditorAsync(payment.Id);
+            creditor.AmountPaid += payment.Amount;
+            creditor.Balance -= payment.Amount;
+            creditor.Installment += 1;
+            var result = await _creditorRepo.UpdateCreditorAsync(creditor);
+            if(result == null){
+                return new ResponseObject<GetCreditorDto>().CreateResponse($"Payment could not be updated", false, null);
+            }
+            return new ResponseObject<GetCreditorDto>().CreateResponse($"Payment updated successfully", true, 
+                _mapper.Map<GetCreditorDto>(result));
+        }
+
         public async Task<ResponseObject<GetCreditorDto>> UpdateCreditorAsync(UpdateCreditorDto creditor)
         {
             var creditorToUpdate = _mapper.Map<Creditor>(creditor);
@@ -70,6 +86,10 @@ namespace PAY_UP.Application.Services{
             }
             return new ResponseObject<GetCreditorDto>().CreateResponse($"Creditor updated successfully", true, 
                 _mapper.Map<GetCreditorDto>(result));
+        }
+
+        private void CalculateBalance(){
+
         }
     }
 }

@@ -12,7 +12,7 @@ namespace PAY_UP.Domain.Debtors
         public decimal AmountOwed { get; set; }
         public decimal AmountPaid { get; set; }       
         public int Installment { get; set; }       
-                
+        public decimal Balance { get; set; }
         public DateTime DateCreditWasCollected { get; set; }
         public DateTime DateForRepayment { get; set; }
         public ReminderType ReminderType { get; set; }
