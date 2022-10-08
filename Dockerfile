@@ -1,21 +1,17 @@
 # syntax=docker/dockerfile:1
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
-WORKDIR /source
-    
+WORKDIR /app
+
 # Copy csproj and restore as distinct layers
-COPY . .
+COPY . ./
+RUN dotnet restore
 
-
-RUN dotnet restore --disable-parallel
-    
 # Copy everything else and build
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-RUN dotnet publish -c Release -o /app-out --no-restore
-    
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
-WORKDIR /app-out
-COPY --from=build /app-out ./
-
-EXPOSE 5000
+WORKDIR /app
+COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "PAY-UP.Api.dll"]

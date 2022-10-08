@@ -8,6 +8,11 @@ namespace PAY_UP.Persistence.Creditors.Configuration{
         {
             builder.ToTable("Creditors");
             builder.HasKey(x => x.Id);
+
+            builder.Property(x => x.AmountOwed)
+                .HasColumnType("money");
+            builder.Property(x => x.AmountPaid)
+                .HasColumnType("money");
         }
     }
 }

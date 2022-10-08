@@ -9,6 +9,10 @@ namespace PAY_UP.Domain.Debtors
         public string Lastname { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public decimal AmountOwed { get; set; }
+        public decimal AmountPaid { get; set; }       
+        public int Installment { get; set; }       
+                
         public DateTime DateCreditWasCollected { get; set; }
         public DateTime DateForRepayment { get; set; }
         public ReminderType ReminderType { get; set; }
