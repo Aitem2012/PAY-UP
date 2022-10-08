@@ -7,7 +7,8 @@ namespace PAY_UP.Application.Dtos.Creditors{
         public string Lastname { get; set; }
         public string Email { get; set; }
         public decimal AmountOwed { get; set; }
-        public decimal AmountPaid { get; set; }       
+        public decimal AmountPaid { get; set; }
+        public decimal Balance { get; set; }       
         public int Installment { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime DateCreditWasCollected { get; set; }

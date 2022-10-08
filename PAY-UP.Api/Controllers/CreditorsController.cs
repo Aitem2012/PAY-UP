@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PAY_UP.Application.Abstracts.Services;
 using PAY_UP.Application.Dtos;
+using PAY_UP.Application.Dtos.Common;
 using PAY_UP.Application.Dtos.Creditors;
 using PAY_UP.Common.Helpers;
 
@@ -22,6 +23,12 @@ namespace PAY_UP.Api.Controllers{
             return Ok(result);
         }
 
+        [HttpGet("creditors-for-user",Name = nameof(GetCreditorsForUser)), ProducesResponseType(typeof(ResponseObject<GetCreditorDto>), StatusCodes.Status200OK), ProducesDefaultResponseType]
+        public async Task<IActionResult> GetCreditorsForUser(string userId){
+            var result = await _creditorService.GetCreditorsForUserAsync(userId);
+            return Ok(result);
+        }
+
         [HttpGet("{id}",Name = nameof(GetCreditor)), ProducesResponseType(typeof(ResponseObject<GetCreditorDto>), StatusCodes.Status200OK), ProducesDefaultResponseType]
         public async Task<IActionResult> GetCreditor(Guid Id){
             var result = await _creditorService.GetCreditorAsync(Id);
@@ -38,7 +45,15 @@ namespace PAY_UP.Api.Controllers{
             }
             return Ok(result);
         }
-        
+        [HttpPost("make-repayment", Name = nameof(MakeRepayment)), ProducesResponseType(typeof(ResponseObject<GetCreditorDto>), StatusCodes.Status200OK), ProducesDefaultResponseType]
+        public async Task<IActionResult> MakeRepayment(PaymentDto payment){
+            var result = await _creditorService.MakePayment(payment);
+            if(!result.IsSuccessfull){
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
+        }
+
         [HttpPut(Name = nameof(UpdateCreditor)), ProducesResponseType(typeof(ResponseObject<GetCreditorDto>), StatusCodes.Status200OK), ProducesDefaultResponseType]
         public async Task<IActionResult> UpdateCreditor(UpdateCreditorDto creditor){
             var result = await _creditorService.UpdateCreditorAsync(creditor);
