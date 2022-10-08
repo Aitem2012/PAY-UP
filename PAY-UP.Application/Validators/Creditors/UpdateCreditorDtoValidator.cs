@@ -12,7 +12,9 @@ namespace PAY_UP.Application.Validators.Creditors{
             RuleFor(x => x.PhoneNumber).NotEmpty().NotNull().WithMessage("{propertyName} is required");
             RuleFor(x => x.DateCreditWasCollected).NotEmpty().NotNull().WithMessage("{propertyName} is required");
             RuleFor(x => x.DateForRepayment).NotEmpty().NotNull().WithMessage("{propertyName} is required");
-            RuleFor(x => x.ReminderType).NotEmpty().NotNull().WithMessage("{propertyName} is required");
+            RuleFor(x => x.ReminderType).IsInEnum().NotEmpty().NotNull().WithMessage("{propertyName} is required");
+            RuleFor(x => x.AmountOwed).GreaterThan(0).NotEmpty().NotNull().WithMessage("{propertyName} is required");
+            RuleFor(x => x.AmountPaid).GreaterThan(0).NotEmpty().NotNull().WithMessage("{propertyName} is required");
         }
     }
 }

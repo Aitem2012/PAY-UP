@@ -61,7 +61,9 @@ namespace PAY_UP.Persistence.Repositories{
         {
             try{
                 _context.Creditors.Attach(creditor);
-                await _context.SaveChangesAsync(CancellationToken.None);
+                if(await _context.SaveChangesAsync(CancellationToken.None) > 0){
+                    return creditor;
+                }
             }catch(Exception ex){
                 _logger.LogInformation($"Creditor could not be updated {ex.StackTrace}");
             }
