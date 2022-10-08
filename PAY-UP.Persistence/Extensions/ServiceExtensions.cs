@@ -1,4 +1,6 @@
 ﻿using FluentValidation.AspNetCore;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +27,7 @@ namespace PAY_UP.Persistence.Extensions
     {
         public static void AddDatabaseServices(this IServiceCollection services, IConfiguration config)
         {
+            var connectionString = config.GetConnectionString("DefaultConnection");
             services.AddScoped<IAppDbContext, AppDbContext>();
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
@@ -33,11 +36,27 @@ namespace PAY_UP.Persistence.Extensions
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
             services.Configure<JWTData>(config.GetSection(JWTData.Data));
+            services.AddHangfire(option => option
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(connectionString, new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true
+                }
+            ));
+            services.AddHangfireServer(option =>
+            {
+                option.SchedulePollingInterval = TimeSpan.FromMinutes(5);
+            });
         }
 
         public static void AddApplicationServices(this IServiceCollection services)
         {
-
             services.AddAutoMapper(typeof(PayUpMappingProfile));
             services.AddHttpContextAccessor();
             services.AddScoped<ISmsService, SmsService>();
@@ -48,10 +67,14 @@ namespace PAY_UP.Persistence.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ICreditorRepository, CreditorRepository>();
             services.AddScoped<ICreditorService, CreditorService>();
+            services.AddScoped<ISchedulingService, SchedulingService>();
+            services.AddScoped<IDebitorService, DebitorService>();
+            services.AddScoped<IDebitorRepository, DebitorRepository>();
             services.AddFluentValidation(opt =>
             {
                 opt.RegisterValidatorsFromAssembly(typeof(SmSDtoValidator).GetTypeInfo().Assembly);
             });
+
         }
 
     }

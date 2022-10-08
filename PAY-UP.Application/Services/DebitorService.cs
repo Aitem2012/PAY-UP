@@ -20,6 +20,7 @@ namespace PAY_UP.Application.Services{
         public async Task<ResponseObject<GetDebtorDto>> CreateDebtorAsync(CreateDebtorDto debtor)
         {
             var debtorToCreate = _mapper.Map<Debtor>(debtor);
+            debtorToCreate.Balance = debtor.AmountOwed;
             var result = await _debitorRepo.CreateDebtorAsync(debtorToCreate);
             if(result == null){
                 return new ResponseObject<GetDebtorDto>().CreateResponse($"Debtor could not be created", false, null);

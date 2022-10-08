@@ -33,8 +33,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PAY-UP.Application\PAY-UP.Application.csproj" />
-    <ProjectReference Include="..\PAY-UP.Common\PAY-UP.Common.csproj" />
-    <ProjectReference Include="..\PAY-UP.Domain\PAY-UP.Domain.csproj" />
     <ProjectReference Include="..\PAY-UP.Infrastructure\PAY-UP.Infrastructure.csproj" />
   </ItemGroup>
 

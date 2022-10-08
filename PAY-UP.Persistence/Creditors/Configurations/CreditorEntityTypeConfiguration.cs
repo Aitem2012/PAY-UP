@@ -10,9 +10,11 @@ namespace PAY_UP.Persistence.Creditors.Configuration{
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.AmountOwed)
-                .HasColumnType("money");
+                .HasColumnType("money")
+                .HasPrecision(2);
             builder.Property(x => x.AmountPaid)
-                .HasColumnType("money");
+                .HasColumnType("money")
+                .HasPrecision(2);
         }
     }
 }
