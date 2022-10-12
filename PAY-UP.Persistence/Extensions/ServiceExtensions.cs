@@ -1,10 +1,13 @@
 ﻿using FluentValidation.AspNetCore;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using PAY_UP.Application;
 using PAY_UP.Application.Abstracts.Infrastructure;
 using PAY_UP.Application.Abstracts.Persistence;
@@ -20,6 +23,7 @@ using PAY_UP.Infrastructure.Token;
 using PAY_UP.Persistence.Context;
 using PAY_UP.Persistence.Repositories;
 using System.Reflection;
+using System.Text;
 
 namespace PAY_UP.Persistence.Extensions
 {
@@ -35,7 +39,9 @@ namespace PAY_UP.Persistence.Extensions
             services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
+
             services.Configure<JWTData>(config.GetSection(JWTData.Data));
+
             services.AddHangfire(option => option
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
@@ -53,6 +59,35 @@ namespace PAY_UP.Persistence.Extensions
             {
                 option.SchedulePollingInterval = TimeSpan.FromMinutes(5);
             });
+        }
+
+        public static void AddAuthenticationServices(this IServiceCollection services, IConfiguration config)
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+          .AddJwtBearer(options =>
+          {
+              options.TokenValidationParameters = new TokenValidationParameters
+              {
+                  ValidateIssuer = true,
+                  ValidateAudience = true,
+                  ValidateLifetime = true,
+                  ValidateIssuerSigningKey = true,
+                  ValidIssuer = config.GetSection("JWTConfigurations:Issuer").Value,
+                  ValidAudience = config.GetSection("JWTConfigurations:Audience").Value,
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("JWTConfigurations:SecretKey").Value))
+              };
+          })
+          .AddCookie(options =>
+          {
+              options.ForwardAuthenticate = CookieAuthenticationDefaults.AuthenticationScheme;
+          });
+          services.AddAuthorization(options =>{
+            options.AddPolicy("AdminOnly", policy => policy.RequireClaim("admin"));
+          });
         }
 
         public static void AddApplicationServices(this IServiceCollection services)

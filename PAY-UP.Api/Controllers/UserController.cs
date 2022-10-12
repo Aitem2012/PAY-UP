@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PAY_UP.Application.Abstracts.Services;
 using PAY_UP.Application.Dtos.Users;
 using PAY_UP.Common.Helpers;
@@ -6,6 +7,7 @@ using PAY_UP.Common.Helpers;
 namespace PAY_UP.Api.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -21,6 +23,7 @@ namespace PAY_UP.Api.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
+        [Authorize]
         [HttpGet(Name = nameof(GetUsers)), ProducesResponseType(typeof(ResponseObject<GetUserDto>), StatusCodes.Status201Created), ProducesDefaultResponseType]
         public async Task<IActionResult> GetUsers(bool isActive = false)
         {

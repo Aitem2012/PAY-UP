@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PAY_UP.Application.Abstracts.Services;
 using PAY_UP.Application.Dtos.Common;
@@ -8,6 +9,7 @@ namespace PAY_UP.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class DebtorsController : ControllerBase
     {
         private readonly IDebitorService _debitorService;

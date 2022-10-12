@@ -8,21 +8,27 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 // Add services to the container.
 
+
+builder.Services.AddControllers();
 builder.Services.AddDatabaseServices(config);
 builder.Services.AddApplicationServices();
+
+builder.Services.AddAuthenticationServices(config);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Food ordering and management API",
+        Title = "Debt Recovery API",
         TermsOfService = new Uri("https://wwww.pay-up.com/terms-of-service"),
         License = new OpenApiLicense
         {
-            Name = "FoodManagement License",
+            Name = "PAY-UP License",
             Url = new Uri("https://www.pay-up.com/license")
         },
         Contact = new OpenApiContact
@@ -55,7 +61,6 @@ builder.Services.AddSwaggerGen(c =>
             });
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 });
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -70,6 +75,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
 app.UseHangfireDashboard();
 
 app.MapControllers();
