@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PAY_UP.Application.Abstracts.Services;
 using PAY_UP.Application.Dtos.Authentication;
 using PAY_UP.Application.Dtos.Users;
@@ -32,8 +33,9 @@ namespace PAY_UP.Api.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("signup-admin", Name = nameof(SignupAdmin)), ProducesResponseType(typeof(GetUserDto), StatusCodes.Status201Created), ProducesDefaultResponseType]
-        public async Task<IActionResult> SignupAdmin([FromForm] CreateUserDto model, IFormFile file)
+        public async Task<IActionResult> SignupAdmin([FromForm] CreateUserDto model)
         {
             return Ok(await _authService.CreateAsync(model, "admin"));
         }
