@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PAY_UP.Application.Abstracts.Infrastructure;
 using PAY_UP.Application.Abstracts.Persistence;
 using PAY_UP.Application.Abstracts.Repositories;
 using PAY_UP.Application.Dtos.Users;
+using PAY_UP.Common.Config;
 using PAY_UP.Common.Extensions;
 using PAY_UP.Common.Helpers;
 using PAY_UP.Domain.AppUsers;
@@ -23,7 +25,8 @@ namespace PAY_UP.Persistence.Repositories
         private readonly ILogger<UserRepository> _logger;
         private readonly IEmailService _emailService;
         private readonly IHttpContextAccessor _httpContext;
-        public UserRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IAppDbContext context, IMapper mapper, ILogger<UserRepository> logger, IEmailService emailService, IHttpContextAccessor httpContext)
+        private readonly IOptions<WebAppConfig> _config;
+        public UserRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IAppDbContext context, IMapper mapper, ILogger<UserRepository> logger, IEmailService emailService, IHttpContextAccessor httpContext, IOptions<WebAppConfig> config)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -32,6 +35,7 @@ namespace PAY_UP.Persistence.Repositories
             _logger = logger;
             _emailService = emailService;
             _httpContext = httpContext;
+            _config = config;
         }
 
         public async Task<AppUser> CreateAsync(CreateUserDto entity, CancellationToken cancellationToken, string role = "user")
@@ -76,7 +80,7 @@ namespace PAY_UP.Persistence.Repositories
                 };
 
                 //TODO: Send confirmation email
-                var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "api/auth/confirm-email ", queryParams, "ConfirmationEmail.html", _httpContext.HttpContext);
+                var template = new NotificationHelper(_config).EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "api/auth/confirm-email ", queryParams, "ConfirmationEmail.html", _httpContext.HttpContext);
                 var res = await _emailService.SendEmailAsync(user.Email, "Email Confirmation", template);
 
                 return user;

@@ -8,7 +8,7 @@ namespace PAY_UP.Application.Validators.Users
         public CreateUserDtoValidator()
         {
             RuleFor(x => x.Email).EmailAddress().NotEmpty().NotNull().WithMessage("{propertyName} is required");
-            RuleFor(x => x.PhoneNumber).Must(x => x.Length.Equals(11)).NotEmpty().NotNull().WithMessage("{propertyName} is required");
+            RuleFor(x => x.PhoneNumber).NotEmpty().NotNull().WithMessage("{propertyName} is required");
             RuleFor(x => x.FirstName).NotEmpty().NotNull().WithMessage("{propertyName} is required");
             RuleFor(x => x.LastName).NotEmpty().NotNull().WithMessage("{propertyName} is required");
             RuleFor(x => x.Password).NotEmpty().NotNull().WithMessage("{propertyName} is required");

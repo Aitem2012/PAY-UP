@@ -61,6 +61,7 @@ builder.Services.AddSwaggerGen(c =>
             });
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 });
+//builder.Services.AddSession();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -71,6 +72,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//app.UseSession();
 
 app.UseAuthentication();
 

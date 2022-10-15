@@ -16,6 +16,7 @@ using PAY_UP.Application.Abstracts.Services;
 using PAY_UP.Application.Dtos.Token;
 using PAY_UP.Application.Services;
 using PAY_UP.Application.Validators.SmS;
+using PAY_UP.Common.Config;
 using PAY_UP.Domain.AppUsers;
 using PAY_UP.Infrastructure.Email;
 using PAY_UP.Infrastructure.Sms;
@@ -85,9 +86,11 @@ namespace PAY_UP.Persistence.Extensions
           {
               options.ForwardAuthenticate = CookieAuthenticationDefaults.AuthenticationScheme;
           });
-          services.AddAuthorization(options =>{
-            options.AddPolicy("AdminOnly", policy => policy.RequireClaim("admin"));
-          });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireClaim("admin"));
+            });
+            services.Configure<WebAppConfig>(config.GetSection("WebAppConfig"));
         }
 
         public static void AddApplicationServices(this IServiceCollection services)
@@ -109,6 +112,7 @@ namespace PAY_UP.Persistence.Extensions
             {
                 opt.RegisterValidatorsFromAssembly(typeof(SmSDtoValidator).GetTypeInfo().Assembly);
             });
+
 
         }
 
