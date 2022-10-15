@@ -23,7 +23,7 @@ namespace PAY_UP.Api.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("signup", Name = nameof(Signup)), ProducesResponseType(typeof(GetUserDto), StatusCodes.Status201Created), ProducesDefaultResponseType]
-        public async Task<IActionResult> Signup([FromForm] CreateUserDto model)
+        public async Task<IActionResult> Signup([FromBody] CreateUserDto model)
         {
             return Ok(await _authService.CreateAsync(model));
         }
@@ -46,7 +46,7 @@ namespace PAY_UP.Api.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("login", Name = nameof(Login)), ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK), ProducesDefaultResponseType]
-        public async Task<IActionResult> Login([FromForm] LoginDto model)
+        public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
             return Ok(await _authService.LoginAsync(model));
         }

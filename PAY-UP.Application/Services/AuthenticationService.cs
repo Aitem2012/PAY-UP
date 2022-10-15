@@ -8,6 +8,7 @@ using PAY_UP.Application.Abstracts.Services;
 using PAY_UP.Application.Dtos.Authentication;
 using PAY_UP.Application.Dtos.Token;
 using PAY_UP.Application.Dtos.Users;
+using PAY_UP.Common.Config;
 using PAY_UP.Common.Extensions;
 using PAY_UP.Common.Helpers;
 using PAY_UP.Domain.AppUsers;
@@ -25,7 +26,8 @@ namespace PAY_UP.Application.Services
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IOptions<JWTData> _options;
-        public AuthenticationService(IUserService userService, UserManager<AppUser> userManager, IMapper mapper, IEmailService emailService, IHttpContextAccessor httpContext, ILogger<AuthenticationService> logger, SignInManager<AppUser> signInManager, ITokenService tokenService, IOptions<JWTData> options)
+        private readonly IOptions<WebAppConfig> _config;
+        public AuthenticationService(IUserService userService, UserManager<AppUser> userManager, IMapper mapper, IEmailService emailService, IHttpContextAccessor httpContext, ILogger<AuthenticationService> logger, SignInManager<AppUser> signInManager, ITokenService tokenService, IOptions<JWTData> options, IOptions<WebAppConfig> config)
         {
             _userService = userService;
             _userManager = userManager;
@@ -36,6 +38,7 @@ namespace PAY_UP.Application.Services
             _signInManager = signInManager;
             _tokenService = tokenService;
             _options = options;
+            _config = config;
         }
 
         public async Task<ResponseObject<bool>> ChangePasswordAsync(ChangePasswordDto changePasswordRequest)
@@ -103,7 +106,7 @@ namespace PAY_UP.Application.Services
                 ["token"] = token
             };
 
-            var template = NotificationHelper.EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "api/auth/reset-password", queryParams, "ResetPasswordTemplate.html", _httpContext.HttpContext);
+            var template = new NotificationHelper(_config).EmailHtmlStringTemplate($"{user.FirstName} {user.LastName}", "Account/ResetPassword", queryParams, "ResetPasswordTemplate.html", _httpContext.HttpContext);
             await _emailService.SendEmailAsync(user.Email, "Password Reset", template);
             return new ResponseObject<bool>().CreateResponse("Password reset link has been sent to your email", true, true);
         }

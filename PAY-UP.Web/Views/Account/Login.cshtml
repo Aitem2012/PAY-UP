@@ -1,0 +1,98 @@
+﻿@model LoginViewModel;
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "_Layout";
+
+    var username = !string.IsNullOrWhiteSpace(ViewBag.UserName) ? ViewBag.UserName : "";
+    var token = !string.IsNullOrWhiteSpace(ViewBag.Token) ? ViewBag.Token : "";
+
+    var returnUrl = !string.IsNullOrWhiteSpace(ViewBag.ReturnUrl) ? ViewBag.ReturnUrl : "";
+}
+
+<div class="col-sm-8 d-flex rounded mx-auto" style="background:#fff !important; margin-top:5% !important; border:1px solid #eee !important">
+    <div class="col-sm-12">
+        <div class="login_card_header" style="padding-bottom:0px; margin-bottom:0px">
+            <div class="text-center my-4"><h1 style="color: #2078BF">Login</h1></div>
+            <div style="font:12px">
+                @if (ViewBag.LoginErrMsg)
+                {
+                    <div class="d-flex justify-content-center ">
+
+                        <div style="width:100%; text-align:justify;" asp-validation-summary="All" class="alert alert-danger forgotPass-list-error" id="summary"></div>
+
+                    </div>
+
+                }
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center login-box-flexed" style="">
+            <div class="col-lg-6 mr-2" style="padding-bottom:0px; margin-bottom:0px;">
+
+                <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl" method="post">
+                    <div class="mb-4">
+                        <div class="mb-4">
+                            <label asp-for="Email" class="login_input_label">Email</label>
+                            <div class="relative">
+                                <input asp-for="Email" class="login_input form-control" placeholder="Enter your email"
+                                       type="text" required />
+                                <div class="login_input_icon">
+                                    <img src="~/images/assets/form-user.png" alt="" />
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-danger font-italic small" asp-validation-for="@Model.Email"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Password" class="login_input_label">Password</label>
+                            <div class="relative">
+                                <input asp-for="Password" class="login_input form-control"
+                                       placeholder="Enter your password" type="password" required />
+                                <div class="login_input_icon">
+                                    <img src="~/images/assets/form-lock.png" alt="" />
+                                </div>
+
+                            </div>
+                            <div>
+                                <span class="text-danger font-italic small" asp-validation-for="@Model.Password"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 d-flex justify-content-between">
+                       
+                        <div>
+                            <a class="text-sm text-dark" asp-controller="Account" asp-action="ForgotPassword">
+                                <small>I forgot my password</small>
+                            </a>
+                        </div>
+                        <small style="color:#06864D">
+                            Don't have an account yet?
+                            <a asp-controller="Account" asp-action="UserRegistration" class="login_signup_link font-weight-bold">
+                                Sign Up
+                            </a>
+                        </small>
+                    </div>
+
+                    <div class="mb-4">
+                        <button class="login_submit_button" type="submit">Login</button>
+                    </div>
+                </form>
+
+            </div>
+
+            <!-- External Login -->
+            
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    }

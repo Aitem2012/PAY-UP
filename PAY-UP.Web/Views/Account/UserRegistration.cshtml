@@ -1,0 +1,124 @@
+﻿@model UserRegistrationViewModel
+
+<div class="col-sm-8 d-flex rounded mx-auto" style="background: #fff !important; margin-top: 5% !important; border: 1px solid #eee !important; margin-bottom: 40px; padding-left:20px; padding-right: 20px; padding-bottom: 30px;">
+    <div class="col-sm-12">
+        <div class="text-center my-4"><h1 style="color: #2078BF">Sign Up</h1></div>
+        <h6 class="text-center px-3">Before we proceed further...</h6>
+        <form method="Post" asp-controller="Account" asp-action="UserRegistration">
+            <div class=" text-danger" asp-validation-summary="ModelOnly"></div>
+            <div class="row">
+               
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="required-field"></label>
+                        <div class="input-group agent-input">
+                            <input type="text" asp-for="FirstName" class="form-control" placeholder="First Name">
+
+                            <div class="input-group-append">
+                                <span class="input-group-text"><img src="~/images/assets/form-user.png" /></span>
+                            </div>
+
+                        </div>
+                        <small class="mb-1 text-danger"><span asp-validation-for="FirstName"></span></small>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label asp-for="LastName" class="required-field"></label>
+                        <div class="input-group agent-input">
+                            <input type="text" asp-for="LastName" class="form-control" placeholder="Last Name">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <img src="~/images/assets/form-user.png" />
+                                </span>
+                            </div>
+                        </div>
+                        <small class="mb-1 text-danger"><span asp-validation-for="LastName"></span></small>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label asp-for="Email" class="required-field"></label>
+                        <div class="input-group  agent-input">
+                            <input type="email" asp-for="Email" class="form-control" placeholder="Email">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <img src="~/images/assets/form-envelope.png" />
+                                </span>
+                            </div>
+                        </div>
+                        <small class="mb-1 text-danger"><span asp-validation-for="Email"></span></small>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber" class="required-field" y></label>
+                        <div class="input-group  agent-input">
+                            <input type="text" asp-for="PhoneNumber" class="form-control" placeholder="Phone Number">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <img src="~/images/assets/form-lock.png" />
+                                </span>
+                            </div>
+                        </div>
+                        <small class="mb-1 text-danger"><span asp-validation-for="PhoneNumber"></span></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label asp-for="Password" class="required-field" y></label>
+                        <div class="input-group  agent-input">
+                            <input type="password" asp-for="Password" class="form-control" placeholder="Password">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <img src="~/images/assets/form-lock.png" />
+                                </span>
+                            </div>
+                        </div>
+                        <small class="mb-1 text-danger"><span asp-validation-for="Password"></span></small>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword" class="required-field" y></label>
+                        <div class="input-group  agent-input">
+                            <input type="password" asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <img src="~/images/assets/form-lock.png" />
+                                </span>
+                            </div>
+                        </div>
+                        <small class="mb-1 text-danger"><span asp-validation-for="ConfirmPassword"></span></small>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                
+            </div>
+            <div class="mb-4 d-flex justify-content-between">
+
+                <small style="color:#06864D">
+                    Already have an account?
+                    <a asp-controller="Account" asp-action="Login" class="login_signup_link font-weight-bold">
+                        Login
+                    </a>
+                </small>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary mt-3" id="create-agent__btn">Sign Up</button>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts{
+    @{
+    <partial name="_ValidationScriptsPartial" />
+    }
+    }
